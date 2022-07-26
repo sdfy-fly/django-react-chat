@@ -164,7 +164,3 @@ CHANNEL_LAYERS = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-# LOGOUT_REDIRECT_URL = '/'
-# LOGIN_REDIRECT_URL = '/rooms/'
-# LOGIN_URL = '/login'

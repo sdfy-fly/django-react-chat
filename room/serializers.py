@@ -13,9 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RoomSerializers(serializers.ModelSerializer):
     """Сериализация комнат чата"""
-    # creator = UserSerializer()
-    # invited = UserSerializer(many=True)
-
     class Meta:
         model = Room
         fields = ("id", "name" , "slug")
@@ -24,7 +21,6 @@ class RoomSerializers(serializers.ModelSerializer):
 class ChatSerializers(serializers.ModelSerializer):
     """Сериализация чата"""
     user = UserSerializer()
-
     class Meta:
         model = Message
         fields = ("user", "text", "date_added")

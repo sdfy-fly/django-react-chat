@@ -7,9 +7,6 @@ class RoomAdmin(admin.ModelAdmin):
     """Комнаты чата"""
     list_display = ("name",)
 
-    # def invited_user(self, obj):
-    #     return "\n".join([user.username for user in obj.invited.all()])
-
 
 @admin.register(Message)
 class ChatAdmin(admin.ModelAdmin):

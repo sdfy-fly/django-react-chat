@@ -22,7 +22,6 @@ class TokenAuthMiddleware:
                     close_old_connections()
             except Token.DoesNotExist:
                 scope['user'] = AnonymousUser()
-        # return self.inner(scope, receive, send)
         return await self.inner(scope, receive, send)
 
 TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(AuthMiddlewareStack(inner))
