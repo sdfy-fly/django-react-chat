@@ -44,6 +44,21 @@ class Dialog(APIView):
         # else:
         #     return Response(status=400)
 
+class CreateUser(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self,request) : 
+
+        username = request.data.get("username")
+        password = request.data.get("password")
+        
+        if User.objects.filter(username=username).exists():
+            return Response(status=401)
+         
+        user = User.objects.create_user(username=username , password=password)
+        user.save()
+        return Response(status=201)
+
 
 # class AddUsersRoom(APIView):
 #     """Добавление юзеров в комнату чата"""
