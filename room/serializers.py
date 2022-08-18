@@ -15,7 +15,7 @@ class RoomSerializers(serializers.ModelSerializer):
     """Сериализация комнат чата"""
     class Meta:
         model = Room
-        fields = ("id", "name" , "slug")
+        fields = ("id", "name" , "first_user" , "second_user")
 
 
 class ChatSerializers(serializers.ModelSerializer):

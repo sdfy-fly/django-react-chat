@@ -10,24 +10,45 @@ from .models import Room, Message
 from .serializers import (RoomSerializers, ChatSerializers)
 
 
-class Rooms(APIView):
-    """Комнаты чата"""
+class Rooms(APIView): 
+    """
+    Диалоги чата: Get запрос возвращает список всех комнат
+    """
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self,request):
-        rooms = Room.objects.all()
+        username = request.GET.get('username')
+        rooms = Room.objects.filter(Q(first_user = username) | Q(second_user = username))
         serializer = RoomSerializers(rooms, many=True)
         return Response({"data": serializer.data})
 
+    def post(self,request) : 
+        first_user = request.POST.get('first_user')
+        second_user = request.POST.get('second_user')
+        name = f'{first_user}-{second_user}'
+
+        room = Room.objects.create(name=name, first_user=first_user, second_user=second_user)
+        room.save()
+        return Response(status=200)
+
+
 class Dialog(APIView):
-    """Диалог чата, сообщение"""
+    """Получение сообщений из определенного диалога"""
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request):
         room = request.GET.get("room")
-        chat = Message.objects.filter(room=room)
+
+        try:  
+            id = Room.objects.get(name = room).pk
+        except : 
+            return Response({"error" : "wrong room name"})
+
+        chat = Message.objects.filter(room=id)
         serializer = ChatSerializers(chat, many=True)
         return Response({"data": serializer.data})
+
+
 
 class CreateUser(APIView):
     permission_classes = [permissions.AllowAny, ]
@@ -45,5 +66,5 @@ class CreateUser(APIView):
          
         user = User.objects.create_user(username=username , password=password , email=email)
         user.save()
-        return Response(status=201)
+        return Response(status=200)
 
