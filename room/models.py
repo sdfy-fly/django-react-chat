@@ -12,8 +12,8 @@ class Room(models.Model):
 
 
 class Message(models.Model):
-    room = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, related_name='messages', on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='messages', on_delete=models.PROTECT)
     text = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
 
