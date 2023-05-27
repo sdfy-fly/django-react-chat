@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
 
-    'src.room'
+    'src.room',
+    'src.service',
 ]
 
 MIDDLEWARE = [

@@ -1,8 +1,12 @@
-from django.urls import path 
-from .views import *
+from rest_framework import routers
+from django.urls import path, include
+
+from .views import RoomView
+
+
+router = routers.SimpleRouter()
+router.register('chat', RoomView)
 
 urlpatterns = [
-    path('room/', Rooms.as_view()),
-    path('dialog/', Dialog.as_view()),
-    path('signup/', CreateUser.as_view()),
+    path('', include(router.urls))
 ]

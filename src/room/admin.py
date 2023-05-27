@@ -1,14 +1,17 @@
 from django.contrib import admin
-from .models import Room, Message
+from .models import Room, RoomMembers, Message
+
+
+class RoomMembersInline(admin.TabularInline):
+    model = RoomMembers
 
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    """Комнаты чата"""
-    list_display = ("id" , "name" , "first_user" , "second_user")
+    inlines = [RoomMembersInline]
 
 
 @admin.register(Message)
 class ChatAdmin(admin.ModelAdmin):
-    """Диалоги"""
-    list_display = ("room", "user", "text", "date_added")
+    """Сообщения"""
+    list_display = ("id", "room", "user", "text", "created_at", "updated_at")

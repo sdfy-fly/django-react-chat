@@ -1,70 +1,59 @@
-from django.db.models import Q
-
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
-
-from django.contrib.auth.models import User
+from rest_framework import permissions, status
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Room, Message
 from .serializers import (RoomSerializers, ChatSerializers)
+from src.service.models import User
 
 
-class Rooms(APIView): 
-    """
-    Диалоги чата: Get запрос возвращает список всех комнат
-    """
-    permission_classes = [permissions.IsAuthenticated, ]
+# api/chat    get    - получение всех чатов у юзера с id 1
+# api/chat    post   - создание чата
+# api/chat/1/ put    - смена названия чата
+# api/chat/1/ delete - удаление чата
 
-    def get(self,request):
-        username = request.GET.get('username')
-        rooms = Room.objects.filter(Q(first_user = username) | Q(second_user = username))
-        serializer = RoomSerializers(rooms, many=True)
-        return Response({"data": serializer.data})
+# api/chat/message/1 retrive - получить все сообщения комнаты 1
+# api/chat/message/1 put - отредактировать сообщение юзера в комнате 1
+# api/chat/message/1 post - добавить сообщение юзера в комнату 1
+# api/chat/message/1 delete - удалить сообщение юзера в комнате 1
 
-    def post(self,request) : 
-        first_user = request.POST.get('first_user')
-        second_user = request.POST.get('second_user')
-        name = f'{first_user}-{second_user}'
+# api/chat/members/1 retrieve - получить всех юзеров комнаты 1
+# api/chat/members post   - добавить юзера в комнату
+# api/chat/members delete - удалить юзера из комнаты
 
-        room = Room.objects.create(name=name, first_user=first_user, second_user=second_user)
-        room.save()
-        return Response(status=200)
+class RoomView(ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializers
 
+    # TODO: раскоментить
+    # permission_classes = [permissions.IsAuthenticated, ]
 
-class Dialog(APIView):
-    """Получение сообщений из определенного диалога"""
-    permission_classes = [permissions.IsAuthenticated, ]
+    def list(self, request, *args, **kwargs):
+        queryset = self.__get_user_rooms(request)
 
-    def get(self, request):
-        room = request.GET.get("room")
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-        try:  
-            id = Room.objects.get(name = room).pk
-        except : 
-            return Response({"error" : "wrong room name"})
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-        chat = Message.objects.filter(room=id)
-        serializer = ChatSerializers(chat, many=True)
-        return Response({"data": serializer.data})
+    def update(self, request, *args, **kwargs):
+        if self.get_object() in self.__get_user_rooms(request):
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        if self.get_object() in self.__get_user_rooms(request):
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-class CreateUser(APIView):
-    permission_classes = [permissions.AllowAny, ]
-
-    def post(self,request) : 
-
-        username = request.data.get("username")
-        password = request.data.get("password")
-        email = request.data.get("email")
-        
-        if User.objects.filter(username=username).exists():
-            return Response(status=400)
-        if User.objects.filter(email=email).exists():
-            return Response(status=400)
-         
-        user = User.objects.create_user(username=username , password=password , email=email)
-        user.save()
-        return Response(status=200)
+    @staticmethod
+    def __get_user_rooms(request):
+        return [x.room for x in User.objects.get(id=1).rooms.all()]
+        # TODO: раскоментить
+        # return [x.room for x in User.objects.get(id=request.user).rooms.all()]
 

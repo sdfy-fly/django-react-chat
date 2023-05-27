@@ -6,21 +6,24 @@ from .models import Room, Message
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализация пользователя"""
+
     class Meta:
         model = User
         fields = ("id", "username")
 
 
 class RoomSerializers(serializers.ModelSerializer):
-    """Сериализация комнат чата"""
+    """Сериализация чата"""
+
     class Meta:
         model = Room
-        fields = ("id", "name" , "first_user" , "second_user")
+        fields = ("id", "name")
 
 
 class ChatSerializers(serializers.ModelSerializer):
     """Сериализация чата"""
     user = UserSerializer()
+
     class Meta:
         model = Message
         fields = ("user", "text", "date_added")
@@ -28,6 +31,7 @@ class ChatSerializers(serializers.ModelSerializer):
 
 class ChatPostSerializers(serializers.ModelSerializer):
     """Сериализация чата"""
+
     class Meta:
         model = Message
         fields = ("room", "text")
