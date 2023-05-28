@@ -3,11 +3,11 @@ from rest_framework import permissions, status
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Room, Message
-from .serializers import (RoomSerializers, ChatSerializers)
+from .serializers import (RoomSerializers, MessageSerializer, MessageWriteSerializer)
 from src.service.models import User
 
 
-# api/chat    get    - получение всех чатов у юзера с id 1
+# api/chat    get    - получение всех чатов у юзера
 # api/chat    post   - создание чата
 # api/chat/1/ put    - смена названия чата
 # api/chat/1/ delete - удаление чата
@@ -56,4 +56,55 @@ class RoomView(ModelViewSet):
         return [x.room for x in User.objects.get(id=1).rooms.all()]
         # TODO: раскоментить
         # return [x.room for x in User.objects.get(id=request.user).rooms.all()]
+
+
+class MessageView(ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+
+    # TODO: раскоментить
+    # permission_classes = [permissions.IsAuthenticated, ]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return MessageWriteSerializer
+        return super().get_serializer_class()
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+            Метод для получения всех сообщений в определенной комнате по id
+        """
+        try:
+            room = Room.objects.get(pk=kwargs["pk"])
+        except Room.DoesNotExist:
+            return Response({"detail": "Invalid room pk!"}, status=status.HTTP_400_BAD_REQUEST)
+
+        messages = Message.objects.filter(room=room)
+        serializer = self.get_serializer(messages, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """
+            Метод для создания сообщения
+            Принимает: room (room_id) int, user (user_id) int, text (message text) string
+        """
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        """
+            Метод для обновления сообщения по его id
+            Если владелец сообщения != request.user - возвращаю статус 400
+        """
+        if self.get_object().user == request.user:
+            return super().update(request, *args, **kwargs)
+        return Response({"detail": "Invalid message pk!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+            Метод для удаления сообщения по его id
+            Если владелец сообщения != request.user - возвращаю статус 400
+        """
+        if self.get_object().user == request.user:
+            return super().destroy(request, *args, **kwargs)
+        return Response({"detail": "Invalid message pk!"}, status=status.HTTP_400_BAD_REQUEST)
 
