@@ -43,7 +43,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ('id', 'room', 'user', 'text', 'created_at', 'updated_at')
+        fields = ('id', 'room', 'user', 'text', 'is_edited', 'created_at', 'updated_at')
 
 
 class MessageWriteSerializer(serializers.ModelSerializer):
