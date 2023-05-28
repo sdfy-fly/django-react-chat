@@ -11,6 +11,11 @@ class RoomAdmin(admin.ModelAdmin):
     inlines = [RoomMembersInline]
 
 
+@admin.register(RoomMembers)
+class RoomMembersAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(Message)
 class ChatAdmin(admin.ModelAdmin):
     """Сообщения"""

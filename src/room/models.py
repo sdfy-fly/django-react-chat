@@ -1,4 +1,4 @@
-from src.service.models import User
+from src.service.models import User, UserRoomGroup
 from django.db import models
 
 
@@ -11,7 +11,8 @@ class Room(models.Model):
 
 class RoomMembers(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="members")
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="rooms")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rooms")
+    role = models.ForeignKey(UserRoomGroup, on_delete=models.DO_NOTHING, default=3)
 
 
 class Message(models.Model):
