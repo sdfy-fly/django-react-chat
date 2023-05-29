@@ -1,13 +1,12 @@
 from rest_framework import routers
 from django.urls import path, include
 
-from .views import RoomView, MessageView
-
+from .views import RoomView, RoomMembersView
 
 router = routers.SimpleRouter()
 
+router.register('chat/members', RoomMembersView, basename='chat/members')
 router.register('chat', RoomView)
-router.register('message', MessageView)
 
 
 urlpatterns = [

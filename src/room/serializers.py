@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from src.service.models import User
-from .models import Room, Message, RoomMembers
+from .models import Room, RoomMembers
+from src.service.models import User, UserRoomGroup
 from src.service.serializers import UserSerializer, UserRoomGroupSerializer
 
 
@@ -11,24 +11,6 @@ class RoomSerializers(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = ("id", "name")
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    room = RoomSerializers(read_only=True)
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Message
-        fields = ('id', 'room', 'user', 'text', 'is_edited', 'created_at', 'updated_at')
-
-
-class MessageWriteSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    room = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all())
-
-    class Meta:
-        model = Message
-        fields = '__all__'
 
 
 class RoomMembersSerializer(serializers.ModelSerializer):
@@ -44,7 +26,8 @@ class RoomMembersSerializer(serializers.ModelSerializer):
 class RoomMembersWriteSerializer(serializers.ModelSerializer):
     room = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    role = serializers.PrimaryKeyRelatedField(queryset=UserRoomGroup.objects.all())
 
     class Meta:
         model = RoomMembers
-        fields = ('room', 'user')
+        fields = ('room', 'user', 'role')

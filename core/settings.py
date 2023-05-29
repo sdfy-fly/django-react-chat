@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'src.room',
     'src.service',
+    'src.message',
 ]
 
 MIDDLEWARE = [

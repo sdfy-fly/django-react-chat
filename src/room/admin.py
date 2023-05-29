@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Room, RoomMembers, Message
+from .models import Room, RoomMembers
 
 
 class RoomMembersInline(admin.TabularInline):
@@ -14,9 +14,3 @@ class RoomAdmin(admin.ModelAdmin):
 @admin.register(RoomMembers)
 class RoomMembersAdmin(admin.ModelAdmin):
     pass
-
-
-@admin.register(Message)
-class ChatAdmin(admin.ModelAdmin):
-    """Сообщения"""
-    list_display = ("id", "room", "user", "text", "created_at", "updated_at")
